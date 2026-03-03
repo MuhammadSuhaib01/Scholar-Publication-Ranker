@@ -4,6 +4,9 @@ import "./App.css";
 import PublicationList from "./components/PublicationList";
 import ClassificationSummary from "./components/ClassificationSummary";
 
+// Use environment variable for API URL, fallback to localhost for development
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function App() {
   const [scholarUrl, setScholarUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +22,7 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/classify", {
+      const response = await axios.post(`${API_URL}/api/classify`, {
         scholarUrl: scholarUrl,
       });
 
@@ -44,7 +47,7 @@ function App() {
     setExporting(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/export/excel",
+        `${API_URL}/api/export/excel`,
         { publications },
         { responseType: "blob" },
       );
@@ -60,7 +63,10 @@ function App() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Export error:", err);
-      alert("Failed to export Excel file: " + (err.response?.data?.error || err.message));
+      alert(
+        "Failed to export Excel file: " +
+          (err.response?.data?.error || err.message),
+      );
     } finally {
       setExporting(false);
     }
@@ -153,7 +159,9 @@ function App() {
                       "scholar_publications_scopus.xlsx",
                     )
                   }
-                  disabled={exporting || result.scopusOnlyPublications.length === 0}
+                  disabled={
+                    exporting || result.scopusOnlyPublications.length === 0
+                  }
                 >
                   {exporting ? "Exporting..." : "📥 Export Scopus as Excel"}
                 </button>
